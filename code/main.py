@@ -6,34 +6,21 @@ from player import Player
 from camera import Camera
 from level import Level
 from background import Background
+from ui import UI
 
 pygame.init()
-
-# =========================
-# WINDOW
-# =========================
+pygame.mixer.init()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-
 pygame.display.set_caption(TITLE)
 
 clock = pygame.time.Clock()
 
-# =========================
-# OBJECTS
-# =========================
-
 player = Player()
-
 camera = Camera()
-
 level = Level()
-
 background = Background()
-
-# =========================
-# GAME LOOP
-# =========================
+ui = UI()
 
 running = True
 
@@ -45,23 +32,22 @@ while running:
         f"{TITLE} | FPS: {int(clock.get_fps())}"
     )
 
-    # EVENTS
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             running = False
 
-    # UPDATE
-    player.update(level.platforms)
+    player.update(level.platforms, level.rings)
 
     camera.follow(player)
 
-    # DRAW
     background.draw(screen, camera)
 
     level.draw(screen, camera)
 
     player.draw(screen, camera)
+
+    ui.draw(screen, player)
 
     pygame.display.update()
 

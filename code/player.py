@@ -17,18 +17,18 @@ class Player:
             self.height
         )
 
-        # física
         self.velocity_x = 0
         self.velocity_y = 0
 
         self.on_ground = False
-
-        # direção
+        self.rings = 0
         self.facing_right = True
 
-        # =========================
-        # SPRITES
-        # =========================
+        self.coin_sound = pygame.mixer.Sound(
+            "../assets/sounds/coin.wav"
+        )
+
+        self.coin_sound.set_volume(0.3)
 
         self.idle_sprite = pygame.image.load(
             "../assets/player/idle/idle.png"
@@ -46,7 +46,6 @@ class Player:
             "../assets/player/jump/jump.png"
         ).convert_alpha()
 
-        # escala
         self.idle_sprite = pygame.transform.scale(
             self.idle_sprite,
             (96, 96)
@@ -67,52 +66,37 @@ class Player:
             (96, 96)
         )
 
-        # sprite atual
         self.current_sprite = self.idle_sprite
 
-        # animação
         self.animation_timer = 0
-
         self.animation_index = 0
 
     def input(self):
 
         keys = pygame.key.get_pressed()
 
-        # esquerda
         if keys[pygame.K_a]:
             self.velocity_x -= PLAYER_ACCELERATION
-
             self.facing_right = False
 
-        # direita
         if keys[pygame.K_d]:
             self.velocity_x += PLAYER_ACCELERATION
-
             self.facing_right = True
 
-        # pulo
         if keys[pygame.K_SPACE] and self.on_ground:
             self.velocity_y = PLAYER_JUMP_SPEED
-
             self.on_ground = False
 
     def animate(self):
 
-        # pulando
         if not self.on_ground:
-
             self.current_sprite = self.jump_sprite
 
-        # correndo
-        elif self.velocity_x != 0:
-
+        elif abs(self.velocity_x) > 0.2:
             self.animation_timer += 1
 
-            if self.animation_timer >= 15:
-
+            if self.animation_timer >= 10:
                 self.animation_timer = 0
-
                 self.animation_index += 1
 
                 if self.animation_index > 1:
@@ -120,13 +104,10 @@ class Player:
 
             if self.animation_index == 0:
                 self.current_sprite = self.run_1
-
             else:
                 self.current_sprite = self.run_2
 
-        # parado
         else:
-
             self.current_sprite = self.idle_sprite
 
     def apply_gravity(self):
@@ -136,14 +117,12 @@ class Player:
     def apply_friction(self):
 
         if self.velocity_x > 0:
-
             self.velocity_x -= PLAYER_FRICTION
 
             if self.velocity_x < 0:
                 self.velocity_x = 0
 
         elif self.velocity_x < 0:
-
             self.velocity_x += PLAYER_FRICTION
 
             if self.velocity_x > 0:
@@ -171,23 +150,25 @@ class Player:
 
             if self.rect.colliderect(platform.rect):
 
-                # caindo
                 if self.velocity_y > 0:
-
                     self.rect.bottom = platform.rect.top
-
                     self.velocity_y = 0
-
                     self.on_ground = True
 
-                # batendo cabeça
                 elif self.velocity_y < 0:
-
                     self.rect.top = platform.rect.bottom
-
                     self.velocity_y = 0
 
-    def update(self, platforms):
+    def collect_rings(self, rings):
+
+        for ring in rings:
+
+            if not ring.collected and self.rect.colliderect(ring.rect):
+                ring.collected = True
+                self.rings += 1
+                self.coin_sound.play()
+
+    def update(self, platforms, rings):
 
         self.input()
 
@@ -201,13 +182,14 @@ class Player:
 
         self.move_vertical(platforms)
 
+        self.collect_rings(rings)
+
         self.animate()
 
     def draw(self, screen, camera):
 
         sprite = self.current_sprite
 
-        # virar sprite
         if not self.facing_right:
             sprite = pygame.transform.flip(
                 sprite,
