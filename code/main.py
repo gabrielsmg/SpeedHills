@@ -1,41 +1,68 @@
 import pygame
 import sys
 
-# inicia pygame
+from settings import *
+from player import Player
+from camera import Camera
+from level import Level
+from background import Background
+
 pygame.init()
 
-# largura e altura
-WIDTH = 1280
-HEIGHT = 720
+# =========================
+# WINDOW
+# =========================
 
-# cria janela
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-# título da janela
-pygame.display.set_caption("Speed Hills")
+pygame.display.set_caption(TITLE)
 
-# controla FPS
 clock = pygame.time.Clock()
 
-# loop principal
+# =========================
+# OBJECTS
+# =========================
+
+player = Player()
+
+camera = Camera()
+
+level = Level()
+
+background = Background()
+
+# =========================
+# GAME LOOP
+# =========================
+
 running = True
 
 while running:
 
-    # limita FPS
-    clock.tick(60)
+    clock.tick(FPS)
 
-    # eventos
+    pygame.display.set_caption(
+        f"{TITLE} | FPS: {int(clock.get_fps())}"
+    )
+
+    # EVENTS
     for event in pygame.event.get():
 
-        # fechar janela
         if event.type == pygame.QUIT:
             running = False
 
-    # pinta fundo
-    screen.fill((135, 206, 235))
+    # UPDATE
+    player.update(level.platforms)
 
-    # atualiza tela
+    camera.follow(player)
+
+    # DRAW
+    background.draw(screen, camera)
+
+    level.draw(screen, camera)
+
+    player.draw(screen, camera)
+
     pygame.display.update()
 
 pygame.quit()
