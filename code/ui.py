@@ -14,13 +14,17 @@ class UI:
 
     def draw(self, screen, player):
 
-        text = self.font.render(
+        rings_text = self.font.render(
             f"Rings: {player.rings}",
             True,
             WHITE
         )
 
-        screen.blit(
-            text,
-            (20, 20)
+        lives_text = self.font.render(
+            f"Lives: {player.lives}",
+            True,
+            WHITE
         )
+
+        screen.blit(rings_text, (20, 20))
+        screen.blit(lives_text, (20, 60))

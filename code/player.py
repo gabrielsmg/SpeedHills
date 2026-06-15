@@ -22,12 +22,16 @@ class Player:
 
         self.on_ground = False
         self.rings = 0
+        self.lives = 3
+
+        self.invincible = False
+        self.invincible_timer = 0
+
         self.facing_right = True
 
         self.coin_sound = pygame.mixer.Sound(
             "../assets/sounds/coin.wav"
         )
-
         self.coin_sound.set_volume(0.3)
 
         self.idle_sprite = pygame.image.load(
@@ -46,25 +50,10 @@ class Player:
             "../assets/player/jump/jump.png"
         ).convert_alpha()
 
-        self.idle_sprite = pygame.transform.scale(
-            self.idle_sprite,
-            (96, 96)
-        )
-
-        self.run_1 = pygame.transform.scale(
-            self.run_1,
-            (96, 96)
-        )
-
-        self.run_2 = pygame.transform.scale(
-            self.run_2,
-            (96, 96)
-        )
-
-        self.jump_sprite = pygame.transform.scale(
-            self.jump_sprite,
-            (96, 96)
-        )
+        self.idle_sprite = pygame.transform.scale(self.idle_sprite, (96, 96))
+        self.run_1 = pygame.transform.scale(self.run_1, (96, 96))
+        self.run_2 = pygame.transform.scale(self.run_2, (96, 96))
+        self.jump_sprite = pygame.transform.scale(self.jump_sprite, (96, 96))
 
         self.current_sprite = self.idle_sprite
 
@@ -168,7 +157,37 @@ class Player:
                 self.rings += 1
                 self.coin_sound.play()
 
-    def update(self, platforms, rings):
+    def check_enemy_collision(self, enemies):
+
+        if self.invincible:
+            return
+
+        for enemy in enemies:
+
+            if self.rect.colliderect(enemy.rect):
+
+                self.lives -= 1
+
+                self.invincible = True
+                self.invincible_timer = 60
+
+                if enemy.rect.centerx > self.rect.centerx:
+                    self.rect.x -= 80
+                else:
+                    self.rect.x += 80
+
+                self.velocity_y = -12
+
+    def update_invincibility(self):
+
+        if self.invincible:
+
+            self.invincible_timer -= 1
+
+            if self.invincible_timer <= 0:
+                self.invincible = False
+
+    def update(self, platforms, rings, enemies):
 
         self.input()
 
@@ -184,6 +203,10 @@ class Player:
 
         self.collect_rings(rings)
 
+        self.check_enemy_collision(enemies)
+
+        self.update_invincibility()
+
         self.animate()
 
     def draw(self, screen, camera):
@@ -191,11 +214,11 @@ class Player:
         sprite = self.current_sprite
 
         if not self.facing_right:
-            sprite = pygame.transform.flip(
-                sprite,
-                True,
-                False
-            )
+            sprite = pygame.transform.flip(sprite, True, False)
+
+        # piscar quando estiver invencível
+        if self.invincible and self.invincible_timer % 10 < 5:
+            return
 
         screen.blit(
             sprite,

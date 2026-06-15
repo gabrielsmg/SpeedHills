@@ -37,7 +37,10 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    player.update(level.platforms, level.rings)
+    player.update(level.platforms, level.rings, level.enemies)
+
+    for enemy in level.enemies:
+        enemy.update()
 
     camera.follow(player)
 
