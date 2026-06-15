@@ -7,10 +7,7 @@ class UI:
 
     def __init__(self):
 
-        self.font = pygame.font.SysFont(
-            "Arial",
-            32
-        )
+        self.font = pygame.font.SysFont("Arial", 32)
 
     def draw(self, screen, player):
 

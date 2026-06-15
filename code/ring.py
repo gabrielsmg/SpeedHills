@@ -23,7 +23,6 @@ class Ring:
 
         if self.animation_timer >= 15:
             self.animation_timer = 0
-
             self.frame_index += 1
 
             if self.frame_index >= len(self.frames):

@@ -56,7 +56,6 @@ class Player:
         self.jump_sprite = pygame.transform.scale(self.jump_sprite, (96, 96))
 
         self.current_sprite = self.idle_sprite
-
         self.animation_timer = 0
         self.animation_index = 0
 
@@ -129,10 +128,17 @@ class Player:
 
         self.rect.x += self.velocity_x
 
+        if self.rect.left < 0:
+            self.rect.left = 0
+            self.velocity_x = 0
+
+        if self.rect.right > WORLD_WIDTH:
+            self.rect.right = WORLD_WIDTH
+            self.velocity_x = 0
+
     def move_vertical(self, platforms):
 
         self.rect.y += self.velocity_y
-
         self.on_ground = False
 
         for platform in platforms:
@@ -162,26 +168,35 @@ class Player:
         if self.invincible:
             return
 
-        for enemy in enemies:
+        for enemy in enemies[:]:
 
             if self.rect.colliderect(enemy.rect):
 
-                self.lives -= 1
+                player_is_falling = self.velocity_y > 0
+                player_is_above_enemy = self.rect.bottom <= enemy.rect.centery + 20
 
-                self.invincible = True
-                self.invincible_timer = 60
+                if player_is_falling and player_is_above_enemy:
 
-                if enemy.rect.centerx > self.rect.centerx:
-                    self.rect.x -= 80
+                    enemies.remove(enemy)
+                    self.velocity_y = -14
+                    self.rings += 2
+
                 else:
-                    self.rect.x += 80
 
-                self.velocity_y = -12
+                    self.lives -= 1
+                    self.invincible = True
+                    self.invincible_timer = 60
+
+                    if enemy.rect.centerx > self.rect.centerx:
+                        self.rect.x -= 100
+                    else:
+                        self.rect.x += 100
+
+                    self.velocity_y = -12
 
     def update_invincibility(self):
 
         if self.invincible:
-
             self.invincible_timer -= 1
 
             if self.invincible_timer <= 0:
@@ -216,7 +231,6 @@ class Player:
         if not self.facing_right:
             sprite = pygame.transform.flip(sprite, True, False)
 
-        # piscar quando estiver invencível
         if self.invincible and self.invincible_timer % 10 < 5:
             return
 

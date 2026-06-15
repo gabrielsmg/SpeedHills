@@ -98,14 +98,8 @@ class Enemy:
 
         image = self.frames[self.frame_index]
 
-        # Os sprites baixados estão invertidos por padrão.
-        # Por isso fazemos o flip quando direction == 1.
         if self.direction == 1:
-            image = pygame.transform.flip(
-                image,
-                True,
-                False
-            )
+            image = pygame.transform.flip(image, True, False)
 
         screen.blit(
             image,
