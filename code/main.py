@@ -16,11 +16,15 @@ pygame.display.set_caption(TITLE)
 
 clock = pygame.time.Clock()
 
-player = Player()
-camera = Camera()
-level = Level()
-background = Background()
-ui = UI()
+
+def reset_game():
+
+    return Player(), Camera(), Level(), Background(), UI()
+
+
+player, camera, level, background, ui = reset_game()
+
+game_state = "playing"
 
 running = True
 
@@ -37,20 +41,49 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    player.update(level.platforms, level.rings, level.enemies)
+        if event.type == pygame.KEYDOWN:
 
-    for enemy in level.enemies:
-        enemy.update()
+            if game_state in ["win", "game_over"] and event.key == pygame.K_r:
 
-    camera.follow(player)
+                player, camera, level, background, ui = reset_game()
+
+                game_state = "playing"
+
+    if game_state == "playing":
+
+        player.update(level.platforms, level.rings, level.enemies)
+
+        for enemy in level.enemies:
+            enemy.update()
+
+        camera.follow(player)
+
+        if player.rect.colliderect(level.goal.rect):
+            game_state = "win"
+
+        if player.lives <= 0:
+            game_state = "game_over"
 
     background.draw(screen, camera)
-
     level.draw(screen, camera)
-
     player.draw(screen, camera)
-
     ui.draw(screen, player)
+
+    if game_state == "win":
+
+        ui.draw_center_message(
+            screen,
+            "FASE COMPLETA!",
+            "Pressione R para jogar novamente"
+        )
+
+    elif game_state == "game_over":
+
+        ui.draw_center_message(
+            screen,
+            "GAME OVER",
+            "Pressione R para tentar novamente"
+        )
 
     pygame.display.update()
 

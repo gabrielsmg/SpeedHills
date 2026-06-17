@@ -1,5 +1,6 @@
 import pygame
 
+from goal import Goal
 from settings import *
 from tile import Tile
 from ring import Ring
@@ -45,6 +46,7 @@ class Level:
             pygame.image.load("../assets/enemies/ladybug_walk_a.png").convert_alpha(),
             pygame.image.load("../assets/enemies/ladybug_walk_b.png").convert_alpha()
         ]
+        self.goal = Goal(WORLD_WIDTH - 300, HEIGHT - 192)
 
         self.create_level()
 
@@ -159,3 +161,5 @@ class Level:
 
         for enemy in self.enemies:
             enemy.draw(screen, camera)
+
+        self.goal.draw(screen, camera)
