@@ -7,6 +7,7 @@ from camera import Camera
 from level import Level
 from background import Background
 from ui import UI
+from menu import Menu
 
 pygame.init()
 pygame.mixer.init()
@@ -19,12 +20,12 @@ clock = pygame.time.Clock()
 
 def reset_game():
 
-    return Player(), Camera(), Level(), Background(), UI()
+    return Player(), Camera(), Level(), Background(), UI(), Menu()
 
 
-player, camera, level, background, ui = reset_game()
+player, camera, level, background, ui, menu = reset_game()
 
-game_state = "playing"
+game_state = "menu"
 
 running = True
 
@@ -43,15 +44,29 @@ while running:
 
         if event.type == pygame.KEYDOWN:
 
-            if game_state in ["win", "game_over"] and event.key == pygame.K_r:
+            if game_state == "menu":
 
-                player, camera, level, background, ui = reset_game()
+                if event.key == pygame.K_RETURN:
+                    game_state = "playing"
 
-                game_state = "playing"
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+
+            elif game_state in ["win", "game_over"]:
+
+                if event.key == pygame.K_r:
+
+                    player, camera, level, background, ui, menu = reset_game()
+
+                    game_state = "menu"
 
     if game_state == "playing":
 
-        player.update(level.platforms, level.rings, level.enemies)
+        player.update(
+            level.platforms,
+            level.rings,
+            level.enemies
+        )
 
         for enemy in level.enemies:
             enemy.update()
@@ -64,26 +79,35 @@ while running:
         if player.lives <= 0:
             game_state = "game_over"
 
-    background.draw(screen, camera)
-    level.draw(screen, camera)
-    player.draw(screen, camera)
-    ui.draw(screen, player)
+    if game_state == "menu":
 
-    if game_state == "win":
+        menu.draw(screen)
 
-        ui.draw_center_message(
-            screen,
-            "FASE COMPLETA!",
-            "Pressione R para jogar novamente"
-        )
+    else:
 
-    elif game_state == "game_over":
+        background.draw(screen, camera)
 
-        ui.draw_center_message(
-            screen,
-            "GAME OVER",
-            "Pressione R para tentar novamente"
-        )
+        level.draw(screen, camera)
+
+        player.draw(screen, camera)
+
+        ui.draw(screen, player)
+
+        if game_state == "win":
+
+            ui.draw_center_message(
+                screen,
+                "FASE COMPLETA!",
+                "Pressione R para voltar ao menu"
+            )
+
+        elif game_state == "game_over":
+
+            ui.draw_center_message(
+                screen,
+                "GAME OVER",
+                "Pressione R para voltar ao menu"
+            )
 
     pygame.display.update()
 
