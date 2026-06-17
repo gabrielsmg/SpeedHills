@@ -40,6 +40,7 @@ while running:
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
+
             running = False
 
         if event.type == pygame.KEYDOWN:
@@ -47,9 +48,11 @@ while running:
             if game_state == "menu":
 
                 if event.key == pygame.K_RETURN:
+
                     game_state = "playing"
 
                 if event.key == pygame.K_ESCAPE:
+
                     running = False
 
             elif game_state in ["win", "game_over"]:
@@ -57,7 +60,6 @@ while running:
                 if event.key == pygame.K_r:
 
                     player, camera, level, background, ui, menu = reset_game()
-
                     game_state = "menu"
 
     if game_state == "playing":
@@ -69,14 +71,18 @@ while running:
         )
 
         for enemy in level.enemies:
+
             enemy.update()
 
         camera.follow(player)
 
         if player.rect.colliderect(level.goal.rect):
+
+            player.reset_stage_rings()
             game_state = "win"
 
         if player.lives <= 0:
+
             game_state = "game_over"
 
     if game_state == "menu":

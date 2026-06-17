@@ -24,8 +24,15 @@ class UI:
             WHITE
         )
 
+        form_text = self.font.render(
+            f"Form: {player.form.upper()}",
+            True,
+            WHITE
+        )
+
         screen.blit(rings_text, (20, 20))
         screen.blit(lives_text, (20, 60))
+        screen.blit(form_text, (20, 100))
 
     def draw_center_message(self, screen, title, subtitle):
 
