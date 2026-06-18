@@ -8,7 +8,7 @@ class UI:
     def __init__(self):
 
         self.font = pygame.font.SysFont("Arial", 28)
-        self.big_font = pygame.font.SysFont("Arial", 72)
+        self.big_font = pygame.font.SysFont("Arial", 82, bold=True)
 
         self.coin_icon = pygame.image.load(
             "../assets/rings/coin_gold.png"
@@ -17,6 +17,38 @@ class UI:
         self.coin_icon = pygame.transform.scale(
             self.coin_icon,
             (34, 34)
+        )
+
+    def draw_text_outline(self, screen, text, font, color, outline_color, x, y):
+
+        outline_size = 3
+
+        for dx in range(-outline_size, outline_size + 1):
+
+            for dy in range(-outline_size, outline_size + 1):
+
+                if dx != 0 or dy != 0:
+
+                    outline = font.render(
+                        text,
+                        True,
+                        outline_color
+                    )
+
+                    screen.blit(
+                        outline,
+                        (x + dx, y + dy)
+                    )
+
+        text_surface = font.render(
+            text,
+            True,
+            color
+        )
+
+        screen.blit(
+            text_surface,
+            (x, y)
         )
 
     def draw_health_bar(self, screen, player):
@@ -70,15 +102,14 @@ class UI:
             (20, 92)
         )
 
-        text = self.font.render(
+        self.draw_text_outline(
+            screen,
             str(player.rings),
-            True,
-            WHITE
-        )
-
-        screen.blit(
-            text,
-            (62, 95)
+            self.font,
+            WHITE,
+            BLACK,
+            62,
+            95
         )
 
     def draw(self, screen, player):
@@ -89,21 +120,57 @@ class UI:
 
     def draw_center_message(self, screen, title, subtitle):
 
-        title_text = self.big_font.render(title, True, WHITE)
-        subtitle_text = self.font.render(subtitle, True, WHITE)
+        title_surface = self.big_font.render(title, True, WHITE)
+        subtitle_surface = self.font.render(subtitle, True, WHITE)
 
-        screen.blit(
-            title_text,
+        title_x = WIDTH // 2 - title_surface.get_width() // 2
+        title_y = HEIGHT // 2 - 100
+
+        subtitle_x = WIDTH // 2 - subtitle_surface.get_width() // 2
+        subtitle_y = HEIGHT // 2 + 20
+
+        # caixa escura atrás da mensagem
+        pygame.draw.rect(
+            screen,
+            (0, 0, 0),
             (
-                WIDTH // 2 - title_text.get_width() // 2,
-                HEIGHT // 2 - 80
-            )
+                WIDTH // 2 - 430,
+                HEIGHT // 2 - 140,
+                860,
+                260
+            ),
+            border_radius=20
         )
 
-        screen.blit(
-            subtitle_text,
+        pygame.draw.rect(
+            screen,
+            YELLOW,
             (
-                WIDTH // 2 - subtitle_text.get_width() // 2,
-                HEIGHT // 2 + 20
-            )
+                WIDTH // 2 - 430,
+                HEIGHT // 2 - 140,
+                860,
+                260
+            ),
+            4,
+            border_radius=20
+        )
+
+        self.draw_text_outline(
+            screen,
+            title,
+            self.big_font,
+            YELLOW,
+            BLACK,
+            title_x,
+            title_y
+        )
+
+        self.draw_text_outline(
+            screen,
+            subtitle,
+            self.font,
+            WHITE,
+            BLACK,
+            subtitle_x,
+            subtitle_y
         )

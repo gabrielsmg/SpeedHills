@@ -7,45 +7,97 @@ class Menu:
 
     def __init__(self):
 
-        self.title_font = pygame.font.SysFont("Arial", 78)
-        self.font = pygame.font.SysFont("Arial", 34)
+        self.title_font = pygame.font.SysFont("Arial", 82, bold=True)
+        self.font = pygame.font.SysFont("Arial", 36, bold=True)
+
+    def draw_text_outline(self, screen, text, font, color, outline_color, x, y):
+
+        outline_size = 3
+
+        for dx in range(-outline_size, outline_size + 1):
+
+            for dy in range(-outline_size, outline_size + 1):
+
+                if dx != 0 or dy != 0:
+
+                    outline = font.render(
+                        text,
+                        True,
+                        outline_color
+                    )
+
+                    screen.blit(
+                        outline,
+                        (x + dx, y + dy)
+                    )
+
+        text_surface = font.render(
+            text,
+            True,
+            color
+        )
+
+        screen.blit(
+            text_surface,
+            (x, y)
+        )
+
+    def draw_centered_text(self, screen, text, font, color, y):
+
+        text_surface = font.render(text, True, color)
+
+        x = WIDTH // 2 - text_surface.get_width() // 2
+
+        self.draw_text_outline(
+            screen,
+            text,
+            font,
+            color,
+            BLACK,
+            x,
+            y
+        )
 
     def draw(self, screen):
 
         screen.fill((25, 35, 60))
 
-        title = self.title_font.render(
+        self.draw_centered_text(
+            screen,
             "SPEED HILLS",
-            True,
-            WHITE
+            self.title_font,
+            YELLOW,
+            110
         )
 
-        start = self.font.render(
+        self.draw_centered_text(
+            screen,
             "ENTER - Iniciar",
-            True,
-            WHITE
+            self.font,
+            WHITE,
+            280
         )
 
-        move = self.font.render(
+        self.draw_centered_text(
+            screen,
             "A / D - Mover",
-            True,
-            WHITE
+            self.font,
+            WHITE,
+            360
         )
 
-        jump = self.font.render(
+        self.draw_centered_text(
+            screen,
             "SPACE - Pular",
-            True,
-            WHITE
+            self.font,
+            WHITE,
+            420
         )
 
-        exit_text = self.font.render(
+        self.draw_centered_text(
+            screen,
             "ESC - Sair",
-            True,
-            WHITE
+            self.font,
+            WHITE,
+            520
         )
-
-        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 120))
-        screen.blit(start, (WIDTH // 2 - start.get_width() // 2, 270))
-        screen.blit(move, (WIDTH // 2 - move.get_width() // 2, 350))
-        screen.blit(jump, (WIDTH // 2 - jump.get_width() // 2, 410))
-        screen.blit(exit_text, (WIDTH // 2 - exit_text.get_width() // 2, 500))
