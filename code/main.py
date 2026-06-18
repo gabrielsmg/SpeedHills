@@ -68,7 +68,7 @@ while running:
         )
 
         for enemy in level.enemies:
-            enemy.update()
+            enemy.update(level.platforms, level.obstacles, level.enemies)
 
         camera.follow(player)
 

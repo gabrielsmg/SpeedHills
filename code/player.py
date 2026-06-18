@@ -16,6 +16,8 @@ class Player:
         self.on_ground = False
 
         self.rings = 0
+        self.next_health_reward = RINGS_FOR_HEALTH
+
         self.health = MAX_HEALTH
         self.form = "normal"
 
@@ -139,11 +141,13 @@ class Player:
 
         if self.velocity_x > 0:
             self.velocity_x -= friction
+
             if self.velocity_x < 0:
                 self.velocity_x = 0
 
         elif self.velocity_x < 0:
             self.velocity_x += friction
+
             if self.velocity_x > 0:
                 self.velocity_x = 0
 
@@ -175,6 +179,7 @@ class Player:
         self.on_ground = False
 
         for platform in platforms:
+
             if self.rect.colliderect(platform.rect):
 
                 if self.velocity_y > 0:
@@ -189,14 +194,15 @@ class Player:
     def collect_rings(self, rings):
 
         for ring in rings:
+
             if not ring.collected and self.rect.colliderect(ring.rect):
 
                 ring.collected = True
                 self.rings += 1
                 self.coin_sound.play()
 
-                if self.rings >= RINGS_FOR_HEALTH:
-                    self.rings = 0
+                if self.rings >= self.next_health_reward:
+                    self.next_health_reward += RINGS_FOR_HEALTH
                     self.add_health()
 
     def add_health(self):
@@ -211,7 +217,6 @@ class Player:
 
         self.form = "zombie"
         self.health = 1
-        self.rings = 0
         self.enemies_killed = 0
 
         self.invincible = True
@@ -247,6 +252,17 @@ class Player:
         self.invincible_timer = 60
         self.velocity_y = -12
 
+    def add_enemy_kill(self):
+
+        if self.form == "soldier":
+            return
+
+        self.enemies_killed += 1
+
+        if self.enemies_killed >= SOLDIER_KILLS_REQUIRED:
+            self.form = "soldier"
+            self.enemies_killed = SOLDIER_KILLS_REQUIRED
+
     def check_enemy_collision(self, enemies):
 
         if self.invincible:
@@ -263,13 +279,7 @@ class Player:
 
                     enemies.remove(enemy)
                     self.velocity_y = -14
-
-                    if self.form != "soldier":
-                        self.enemies_killed += 1
-
-                    if self.enemies_killed >= SOLDIER_KILLS_REQUIRED:
-                        self.form = "soldier"
-                        self.enemies_killed = SOLDIER_KILLS_REQUIRED
+                    self.add_enemy_kill()
 
                 else:
 
@@ -307,7 +317,7 @@ class Player:
 
     def reset_stage_rings(self):
 
-        self.rings = 0
+        pass
 
     def update(self, platforms, rings, enemies, obstacles):
 
