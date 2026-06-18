@@ -8,7 +8,7 @@ class Menu:
     def __init__(self):
 
         self.title_font = pygame.font.SysFont("Arial", 72)
-        self.font = pygame.font.SysFont("Arial", 32)
+        self.font = pygame.font.SysFont("Arial", 30)
 
     def draw(self, screen):
 
@@ -17,23 +17,25 @@ class Menu:
         title = self.title_font.render("SPEED HILLS", True, WHITE)
         start = self.font.render("Pressione ENTER para iniciar", True, WHITE)
 
-        controls_1 = self.font.render("A / D - Mover", True, WHITE)
-        controls_2 = self.font.render("SPACE - Pular", True, WHITE)
-        controls_3 = self.font.render("CTRL - Socar quando estiver Soldier", True, WHITE)
-        controls_4 = self.font.render("25 moedas = ganha 1 vida", True, WHITE)
-        controls_5 = self.font.render("25 moedas como Zombie = volta ao normal", True, WHITE)
-        controls_6 = self.font.render("50 moedas = vira Soldier", True, WHITE)
-        controls_7 = self.font.render("Pule na cabeça dos inimigos para derrotá-los", True, WHITE)
-        exit_text = self.font.render("ESC - Sair", True, WHITE)
+        controls = [
+            "A / D - Mover",
+            "SPACE - Pular",
+            "Pule na cabeça dos inimigos para derrotá-los",
+            "Mate 10 inimigos para virar Soldier",
+            "Soldier: super velocidade e super pulo",
+            "Se Soldier tomar dano, volta ao normal sem perder vida",
+            "25 moedas = recupera 1 barra de vida",
+            "Na última barra, o personagem vira Zombie",
+            "Zombie é mais lento",
+            "ESC - Sair"
+        ]
 
-        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 60))
-        screen.blit(start, (WIDTH // 2 - start.get_width() // 2, 170))
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 45))
+        screen.blit(start, (WIDTH // 2 - start.get_width() // 2, 140))
 
-        screen.blit(controls_1, (WIDTH // 2 - controls_1.get_width() // 2, 260))
-        screen.blit(controls_2, (WIDTH // 2 - controls_2.get_width() // 2, 305))
-        screen.blit(controls_3, (WIDTH // 2 - controls_3.get_width() // 2, 350))
-        screen.blit(controls_4, (WIDTH // 2 - controls_4.get_width() // 2, 395))
-        screen.blit(controls_5, (WIDTH // 2 - controls_5.get_width() // 2, 440))
-        screen.blit(controls_6, (WIDTH // 2 - controls_6.get_width() // 2, 485))
-        screen.blit(controls_7, (WIDTH // 2 - controls_7.get_width() // 2, 530))
-        screen.blit(exit_text, (WIDTH // 2 - exit_text.get_width() // 2, 600))
+        y = 220
+
+        for line in controls:
+            text = self.font.render(line, True, WHITE)
+            screen.blit(text, (WIDTH // 2 - text.get_width() // 2, y))
+            y += 42

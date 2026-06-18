@@ -9,29 +9,22 @@ class Player:
 
         self.width = 70
         self.height = 90
-
         self.rect = pygame.Rect(100, 300, self.width, self.height)
 
         self.velocity_x = 0
         self.velocity_y = 0
-
         self.on_ground = False
 
         self.rings = 0
-        self.lives = 3
+        self.health = MAX_HEALTH
         self.form = "normal"
 
-        self.life_bonus_25 = False
-        self.soldier_bonus_50 = False
+        self.enemies_killed = 0
 
         self.invincible = False
         self.invincible_timer = 0
 
         self.facing_right = True
-
-        self.is_punching = False
-        self.punch_timer = 0
-        self.punch_rect = pygame.Rect(0, 0, 60, 50)
 
         self.coin_sound = pygame.mixer.Sound("../assets/sounds/coin.wav")
         self.coin_sound.set_volume(0.3)
@@ -50,7 +43,6 @@ class Player:
         self.soldier_run_1 = pygame.image.load("../assets/player/soldier/soldier_walk1.png").convert_alpha()
         self.soldier_run_2 = pygame.image.load("../assets/player/soldier/soldier_walk2.png").convert_alpha()
         self.soldier_jump = pygame.image.load("../assets/player/soldier/soldier_jump.png").convert_alpha()
-        self.soldier_punch = pygame.image.load("../assets/player/soldier/soldier_punch.png").convert_alpha()
 
         self.idle_sprite = pygame.transform.scale(self.idle_sprite, (96, 96))
         self.run_1 = pygame.transform.scale(self.run_1, (96, 96))
@@ -66,7 +58,6 @@ class Player:
         self.soldier_run_1 = pygame.transform.scale(self.soldier_run_1, (96, 96))
         self.soldier_run_2 = pygame.transform.scale(self.soldier_run_2, (96, 96))
         self.soldier_jump = pygame.transform.scale(self.soldier_jump, (96, 96))
-        self.soldier_punch = pygame.transform.scale(self.soldier_punch, (96, 96))
 
         self.current_sprite = self.idle_sprite
         self.animation_timer = 0
@@ -85,7 +76,6 @@ class Player:
     def input(self):
 
         keys = pygame.key.get_pressed()
-
         acceleration, max_speed, jump_speed = self.get_movement_values()
 
         if keys[pygame.K_a]:
@@ -100,27 +90,19 @@ class Player:
             self.velocity_y = jump_speed
             self.on_ground = False
 
-        if keys[pygame.K_LCTRL] and self.form == "soldier" and not self.is_punching:
-            self.is_punching = True
-            self.punch_timer = 18
-
     def get_animation_set(self):
 
         if self.form == "zombie":
-            return self.zombie_idle, self.zombie_run_1, self.zombie_run_2, self.zombie_jump, self.zombie_idle
+            return self.zombie_idle, self.zombie_run_1, self.zombie_run_2, self.zombie_jump
 
         if self.form == "soldier":
-            return self.soldier_idle, self.soldier_run_1, self.soldier_run_2, self.soldier_jump, self.soldier_punch
+            return self.soldier_idle, self.soldier_run_1, self.soldier_run_2, self.soldier_jump
 
-        return self.idle_sprite, self.run_1, self.run_2, self.jump_sprite, self.idle_sprite
+        return self.idle_sprite, self.run_1, self.run_2, self.jump_sprite
 
     def animate(self):
 
-        idle, run1, run2, jump, punch = self.get_animation_set()
-
-        if self.is_punching and self.form == "soldier":
-            self.current_sprite = punch
-            return
+        idle, run1, run2, jump = self.get_animation_set()
 
         if not self.on_ground:
             self.current_sprite = jump
@@ -136,10 +118,7 @@ class Player:
                 if self.animation_index > 1:
                     self.animation_index = 0
 
-            if self.animation_index == 0:
-                self.current_sprite = run1
-            else:
-                self.current_sprite = run2
+            self.current_sprite = run1 if self.animation_index == 0 else run2
 
         else:
             self.current_sprite = idle
@@ -153,22 +132,18 @@ class Player:
         friction = PLAYER_FRICTION
 
         if self.form == "zombie":
-            friction = 0.18
+            friction = 0.16
 
         if self.form == "soldier":
-            friction = 0.4
+            friction = 0.45
 
         if self.velocity_x > 0:
-
             self.velocity_x -= friction
-
             if self.velocity_x < 0:
                 self.velocity_x = 0
 
         elif self.velocity_x < 0:
-
             self.velocity_x += friction
-
             if self.velocity_x > 0:
                 self.velocity_x = 0
 
@@ -200,7 +175,6 @@ class Player:
         self.on_ground = False
 
         for platform in platforms:
-
             if self.rect.colliderect(platform.rect):
 
                 if self.velocity_y > 0:
@@ -215,43 +189,63 @@ class Player:
     def collect_rings(self, rings):
 
         for ring in rings:
-
             if not ring.collected and self.rect.colliderect(ring.rect):
 
                 ring.collected = True
                 self.rings += 1
                 self.coin_sound.play()
-                self.check_ring_rewards()
 
-    def check_ring_rewards(self):
+                if self.rings >= RINGS_FOR_HEALTH:
+                    self.rings = 0
+                    self.add_health()
 
-        if self.rings >= 25 and not self.life_bonus_25:
+    def add_health(self):
 
-            if self.form == "zombie":
-                self.form = "normal"
+        if self.health < MAX_HEALTH:
+            self.health += 1
 
-            self.lives += 1
-            self.life_bonus_25 = True
-
-        if self.rings >= 50 and not self.soldier_bonus_50:
-
-            self.form = "soldier"
-            self.soldier_bonus_50 = True
+        if self.form == "zombie":
+            self.form = "normal"
 
     def transform_to_zombie(self):
 
         self.form = "zombie"
+        self.health = 1
         self.rings = 0
-        self.life_bonus_25 = False
-        self.soldier_bonus_50 = False
-
-        self.lives = 1
+        self.enemies_killed = 0
 
         self.invincible = True
         self.invincible_timer = 120
 
         self.velocity_x = 0
         self.velocity_y = -14
+
+    def take_damage(self):
+
+        if self.invincible:
+            return
+
+        if self.form == "soldier":
+            self.form = "normal"
+            self.enemies_killed = 0
+            self.invincible = True
+            self.invincible_timer = 90
+            self.velocity_y = -12
+            return
+
+        if self.form == "zombie":
+            self.health = 0
+            return
+
+        self.health -= 1
+
+        if self.health <= 1:
+            self.transform_to_zombie()
+            return
+
+        self.invincible = True
+        self.invincible_timer = 60
+        self.velocity_y = -12
 
     def check_enemy_collision(self, enemies):
 
@@ -269,58 +263,43 @@ class Player:
 
                     enemies.remove(enemy)
                     self.velocity_y = -14
-                    self.rings += 2
-                    self.check_ring_rewards()
+
+                    if self.form != "soldier":
+                        self.enemies_killed += 1
+
+                    if self.enemies_killed >= SOLDIER_KILLS_REQUIRED:
+                        self.form = "soldier"
+                        self.enemies_killed = SOLDIER_KILLS_REQUIRED
 
                 else:
-
-                    self.lives -= 1
-
-                    if self.lives <= 0:
-
-                        if self.form == "zombie":
-                            self.lives = 0
-                            return
-
-                        self.transform_to_zombie()
-                        return
-
-                    self.invincible = True
-                    self.invincible_timer = 60
 
                     if enemy.rect.centerx > self.rect.centerx:
                         self.rect.x -= 100
                     else:
                         self.rect.x += 100
 
-                    self.velocity_y = -12
+                    self.take_damage()
 
-    def update_punch(self, enemies):
+    def check_obstacle_collision(self, obstacles):
 
-        if not self.is_punching:
+        if self.invincible:
             return
 
-        self.punch_timer -= 1
+        for obstacle in obstacles:
 
-        if self.facing_right:
-            self.punch_rect.x = self.rect.right
-        else:
-            self.punch_rect.x = self.rect.left - self.punch_rect.width
+            if self.rect.colliderect(obstacle.rect):
 
-        self.punch_rect.y = self.rect.y + 25
+                if obstacle.rect.centerx > self.rect.centerx:
+                    self.rect.x -= 80
+                else:
+                    self.rect.x += 80
 
-        for enemy in enemies[:]:
-
-            if self.punch_rect.colliderect(enemy.rect):
-                enemies.remove(enemy)
-
-        if self.punch_timer <= 0:
-            self.is_punching = False
+                self.take_damage()
+                break
 
     def update_invincibility(self):
 
         if self.invincible:
-
             self.invincible_timer -= 1
 
             if self.invincible_timer <= 0:
@@ -329,10 +308,8 @@ class Player:
     def reset_stage_rings(self):
 
         self.rings = 0
-        self.life_bonus_25 = False
-        self.soldier_bonus_50 = False
 
-    def update(self, platforms, rings, enemies):
+    def update(self, platforms, rings, enemies, obstacles):
 
         self.input()
         self.apply_friction()
@@ -344,7 +321,7 @@ class Player:
 
         self.collect_rings(rings)
         self.check_enemy_collision(enemies)
-        self.update_punch(enemies)
+        self.check_obstacle_collision(obstacles)
         self.update_invincibility()
 
         self.animate()
