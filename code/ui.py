@@ -129,7 +129,6 @@ class UI:
         subtitle_x = WIDTH // 2 - subtitle_surface.get_width() // 2
         subtitle_y = HEIGHT // 2 + 20
 
-        # caixa escura atrás da mensagem
         pygame.draw.rect(
             screen,
             (0, 0, 0),
@@ -174,3 +173,62 @@ class UI:
             subtitle_x,
             subtitle_y
         )
+
+    def draw_intro_box(self, screen):
+
+        box_width = 860
+        box_height = 330
+
+        box_x = WIDTH // 2 - box_width // 2
+        box_y = HEIGHT // 2 - box_height // 2
+
+        pygame.draw.rect(
+            screen,
+            (0, 0, 0),
+            (box_x, box_y, box_width, box_height),
+            border_radius=20
+        )
+
+        pygame.draw.rect(
+            screen,
+            YELLOW,
+            (box_x, box_y, box_width, box_height),
+            4,
+            border_radius=20
+        )
+
+        title = self.big_font.render(
+            "DICAS DA FASE",
+            True,
+            YELLOW
+        )
+
+        line1 = self.font.render(
+            "Pegue 25 moedas para recuperar 1 barra de vida.",
+            True,
+            WHITE
+        )
+
+        line2 = self.font.render(
+            "Derrote 5 inimigos pulando sobre eles para virar Soldier.",
+            True,
+            WHITE
+        )
+
+        line3 = self.font.render(
+            "No modo Soldier voce fica mais rapido e pula melhor.",
+            True,
+            WHITE
+        )
+
+        line4 = self.font.render(
+            "Pressione ENTER para começar.",
+            True,
+            WHITE
+        )
+
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, box_y + 35))
+        screen.blit(line1, (WIDTH // 2 - line1.get_width() // 2, box_y + 125))
+        screen.blit(line2, (WIDTH // 2 - line2.get_width() // 2, box_y + 170))
+        screen.blit(line3, (WIDTH // 2 - line3.get_width() // 2, box_y + 215))
+        screen.blit(line4, (WIDTH // 2 - line4.get_width() // 2, box_y + 270))

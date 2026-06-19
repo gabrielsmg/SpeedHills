@@ -69,10 +69,15 @@ while running:
 
                 if event.key == pygame.K_RETURN:
                     play_stage_music()
-                    game_state = "playing"
+                    game_state = "intro"
 
                 if event.key == pygame.K_ESCAPE:
                     running = False
+
+            elif game_state == "intro":
+
+                if event.key == pygame.K_RETURN:
+                    game_state = "playing"
 
             elif game_state in ["win", "game_over"]:
 
@@ -117,7 +122,12 @@ while running:
         player.draw(screen, camera)
         ui.draw(screen, player)
 
-        if game_state == "win":
+        if game_state == "intro":
+
+            ui.draw_intro_box(screen)
+
+        elif game_state == "win":
+
             ui.draw_center_message(
                 screen,
                 "FASE COMPLETA!",
@@ -125,6 +135,7 @@ while running:
             )
 
         elif game_state == "game_over":
+
             ui.draw_center_message(
                 screen,
                 "GAME OVER",
