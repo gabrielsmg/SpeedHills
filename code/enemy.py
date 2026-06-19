@@ -23,32 +23,33 @@ class Enemy:
 
         self.direction = random.choice([-1, 1])
 
-        self.speed = random.uniform(1.0, 2.4)
-        self.range_left = random.randint(80, 180)
-        self.range_right = random.randint(120, 260)
-
         self.velocity_y = 0
         self.gravity = 0.5
         self.on_ground = False
 
         self.stuck_timer = 0
         self.last_x = x
-
-        self.separation_cooldown = random.randint(0, 30)
+        self.separation_cooldown = random.randint(0, 40)
 
         if self.enemy_type == "bee":
-            self.speed = random.uniform(1.5, 2.8)
+            self.speed = random.uniform(1.6, 3.0)
+            self.range_left = random.randint(120, 260)
+            self.range_right = random.randint(180, 360)
             self.float_timer = random.uniform(0, 6.28)
             self.vertical_range = random.randint(20, 60)
 
         elif self.enemy_type == "frog":
-            self.speed = random.uniform(0.9, 1.6)
-            self.jump_power = random.uniform(-10, -13)
+            self.speed = random.uniform(0.9, 1.5)
+            self.range_left = random.randint(100, 200)
+            self.range_right = random.randint(120, 240)
+            self.jump_power = random.uniform(-10, -12.5)
             self.jump_timer = random.randint(0, 80)
-            self.jump_delay = random.randint(85, 150)
+            self.jump_delay = random.randint(90, 150)
 
-        elif self.enemy_type == "ladybug":
-            self.speed = random.uniform(0.9, 1.8)
+        else:
+            self.speed = random.uniform(0.9, 1.7)
+            self.range_left = random.randint(100, 220)
+            self.range_right = random.randint(120, 260)
 
     def animate(self):
 
@@ -74,14 +75,14 @@ class Enemy:
         elif self.enemy_type == "frog":
             self.update_frog(platforms, obstacles, enemies)
 
-        elif self.enemy_type == "ladybug":
+        else:
             self.update_ladybug(platforms, obstacles, enemies)
 
         self.check_stuck()
 
     def check_stuck(self):
 
-        if abs(self.rect.x - self.last_x) < 1:
+        if abs(self.rect.x - self.last_x) < 0.5:
             self.stuck_timer += 1
         else:
             self.stuck_timer = 0
@@ -90,7 +91,9 @@ class Enemy:
 
         if self.stuck_timer > 50:
             self.direction *= -1
-            self.rect.x += self.direction * 24
+            self.rect.x += self.direction * 32
+            self.rect.y = self.spawn_y
+            self.velocity_y = 0
             self.stuck_timer = 0
 
     def avoid_other_enemies(self, enemies):
@@ -99,7 +102,7 @@ class Enemy:
             return False
 
         sensor = self.rect.copy()
-        sensor.x += self.direction * 12
+        sensor.x += self.direction * 28
 
         for other in enemies:
 
@@ -107,9 +110,8 @@ class Enemy:
                 continue
 
             if sensor.colliderect(other.rect):
-
                 self.direction *= -1
-                self.separation_cooldown = 35
+                self.separation_cooldown = 45
                 return True
 
         return False
@@ -120,7 +122,6 @@ class Enemy:
             return
 
         self.float_timer += 0.06
-
         self.rect.x += self.speed * self.direction
 
         self.rect.y = self.spawn_y + int(
@@ -144,7 +145,7 @@ class Enemy:
         if self.jump_timer >= self.jump_delay and self.on_ground:
             self.velocity_y = self.jump_power
             self.jump_timer = 0
-            self.jump_delay = random.randint(85, 150)
+            self.jump_delay = random.randint(90, 150)
 
         self.walk_and_avoid(platforms, obstacles, enemies)
 
@@ -154,53 +155,47 @@ class Enemy:
             return
 
         front_sensor = pygame.Rect(
-            self.rect.right if self.direction == 1 else self.rect.left - 26,
-            self.rect.y + 18,
-            26,
-            46
+            self.rect.right if self.direction == 1 else self.rect.left - 32,
+            self.rect.y + 20,
+            32,
+            42
         )
 
         for obstacle in obstacles:
-
             if front_sensor.colliderect(obstacle.rect):
-
                 self.direction *= -1
-                self.rect.x += self.direction * 12
+                self.rect.x += self.direction * 18
                 return
 
         next_rect = self.rect.copy()
         next_rect.x += self.speed * self.direction
 
         for obstacle in obstacles:
-
             if next_rect.colliderect(obstacle.rect):
 
                 if self.direction == 1:
-                    self.rect.right = obstacle.rect.left - 1
+                    self.rect.right = obstacle.rect.left - 2
                 else:
-                    self.rect.left = obstacle.rect.right + 1
+                    self.rect.left = obstacle.rect.right + 2
 
                 self.direction *= -1
                 return
 
         ground_sensor = pygame.Rect(
             next_rect.centerx + (36 * self.direction),
-            next_rect.bottom + 4,
-            12,
-            12
+            next_rect.bottom + 6,
+            14,
+            14
         )
 
         has_ground = False
 
         for platform in platforms:
-
             if ground_sensor.colliderect(platform.rect):
-
                 has_ground = True
                 break
 
         if self.on_ground and not has_ground:
-
             self.direction *= -1
             return
 
@@ -212,18 +207,6 @@ class Enemy:
 
         self.rect.x += self.speed * self.direction
 
-        for obstacle in obstacles:
-
-            if self.rect.colliderect(obstacle.rect):
-
-                if self.direction == 1:
-                    self.rect.right = obstacle.rect.left - 1
-                else:
-                    self.rect.left = obstacle.rect.right + 1
-
-                self.direction *= -1
-                return
-
         self.velocity_y += self.gravity
         self.rect.y += self.velocity_y
 
@@ -234,29 +217,22 @@ class Enemy:
             if self.rect.colliderect(platform.rect):
 
                 if self.velocity_y > 0:
-
                     self.rect.bottom = platform.rect.top
                     self.velocity_y = 0
                     self.on_ground = True
 
                 elif self.velocity_y < 0:
-
                     self.rect.top = platform.rect.bottom
                     self.velocity_y = 0
 
-        # garante que inimigo de chão não fique sobre espinhos/obstáculos
         for obstacle in obstacles:
 
             if self.rect.colliderect(obstacle.rect):
 
-                self.rect.y = self.spawn_y
                 self.direction *= -1
-
-                if self.direction == 1:
-                    self.rect.left = obstacle.rect.right + 4
-                else:
-                    self.rect.right = obstacle.rect.left - 4
-
+                self.rect.x += self.direction * 40
+                self.rect.y = self.spawn_y
+                self.velocity_y = 0
                 return
 
     def draw(self, screen, camera):

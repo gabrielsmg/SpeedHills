@@ -18,14 +18,35 @@ pygame.display.set_caption(TITLE)
 clock = pygame.time.Clock()
 
 
-def reset_game():
+def play_menu_music():
+    pygame.mixer.music.stop()
+    pygame.mixer.music.load("../assets/sounds/menu_som.mp3")
+    pygame.mixer.music.set_volume(0.4)
+    pygame.mixer.music.play(-1)
 
+
+def play_stage_music():
+    pygame.mixer.music.stop()
+    pygame.mixer.music.load("../assets/sounds/stage_music.mp3")
+    pygame.mixer.music.set_volume(0.55)
+    pygame.mixer.music.play(-1)
+
+
+def reset_game():
     return Player(), Camera(), Level(), Background(), UI(), Menu()
 
+
+level_complete_sound = pygame.mixer.Sound("../assets/sounds/level_complete.mp3")
+gameover_sound = pygame.mixer.Sound("../assets/sounds/gameover.mp3")
+
+level_complete_sound.set_volume(0.5)
+gameover_sound.set_volume(0.5)
 
 player, camera, level, background, ui, menu = reset_game()
 
 game_state = "menu"
+
+play_menu_music()
 
 running = True
 
@@ -47,6 +68,7 @@ while running:
             if game_state == "menu":
 
                 if event.key == pygame.K_RETURN:
+                    play_stage_music()
                     game_state = "playing"
 
                 if event.key == pygame.K_ESCAPE:
@@ -56,6 +78,7 @@ while running:
 
                 if event.key == pygame.K_r:
                     player, camera, level, background, ui, menu = reset_game()
+                    play_menu_music()
                     game_state = "menu"
 
     if game_state == "playing":
@@ -74,9 +97,13 @@ while running:
 
         if player.rect.colliderect(level.goal.rect):
             player.reset_stage_rings()
+            pygame.mixer.music.stop()
+            level_complete_sound.play()
             game_state = "win"
 
         if player.health <= 0:
+            pygame.mixer.music.stop()
+            gameover_sound.play()
             game_state = "game_over"
 
     if game_state == "menu":
@@ -91,7 +118,6 @@ while running:
         ui.draw(screen, player)
 
         if game_state == "win":
-
             ui.draw_center_message(
                 screen,
                 "FASE COMPLETA!",
@@ -99,7 +125,6 @@ while running:
             )
 
         elif game_state == "game_over":
-
             ui.draw_center_message(
                 screen,
                 "GAME OVER",

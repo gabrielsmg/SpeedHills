@@ -17,7 +17,7 @@ class Level:
         self.enemies = []
         self.obstacles = []
 
-        self.goal = Goal(WORLD_WIDTH - 300, HEIGHT - 192)
+        self.goal = Goal(WORLD_WIDTH - 120, HEIGHT - 192)
 
         self.ground_tile = pygame.image.load(
             "../assets/tiles/ground.png"
@@ -93,34 +93,27 @@ class Level:
 
     def create_level(self):
 
-        # chão principal
         self.add_platform(0, WORLD_WIDTH, HEIGHT - 64)
 
-        # =========================
-        # INÍCIO
-        # =========================
-
+        # BLOCO 1
         self.add_platform(320, 640, 520)
         self.add_platform(900, 1220, 420)
         self.add_platform(1500, 1820, 540)
 
-        self.add_coin_line(300, HEIGHT - 140, 6)
+        self.add_coin_line(300, HEIGHT - 140, 8)
         self.add_coin_line(350, 450, 5)
         self.add_coin_line(930, 350, 6)
         self.add_coin_line(1520, 470, 5)
 
         self.add_enemy(650, HEIGHT - 128, "ladybug")
-        self.add_enemy(900, HEIGHT - 128, "frog")
+        self.add_enemy(950, HEIGHT - 128, "frog")
         self.add_enemy(1100, 330, "bee")
         self.add_enemy(1600, HEIGHT - 128, "frog")
 
         self.add_spike(1300, HEIGHT - 112)
         self.add_spike(1370, HEIGHT - 112)
 
-        # =========================
         # BLOCO 2
-        # =========================
-
         self.add_platform(2200, 2600, 500)
         self.add_platform(2900, 3300, 430)
         self.add_platform(3600, 3950, 520)
@@ -133,16 +126,12 @@ class Level:
         self.add_enemy(2500, 436, "frog")
         self.add_enemy(3000, 340, "bee")
         self.add_enemy(3750, HEIGHT - 128, "frog")
-        self.add_enemy(3900, HEIGHT - 128, "ladybug")
 
         self.add_spike(2700, HEIGHT - 112)
         self.add_spike(2770, HEIGHT - 112)
         self.add_spike(3400, HEIGHT - 112)
 
-        # =========================
         # BLOCO 3
-        # =========================
-
         self.add_platform(4400, 4700, 380)
         self.add_platform(5000, 5350, 500)
         self.add_platform(5650, 6000, 420)
@@ -163,15 +152,16 @@ class Level:
         self.add_spike(4920, HEIGHT - 112)
         self.add_spike(5480, HEIGHT - 112)
 
-        # =========================
         # BLOCO 4
-        # =========================
-
         self.add_platform(6500, 6900, 540)
         self.add_platform(7200, 7600, 460)
+        self.add_platform(7900, 8350, 380)
+        self.add_platform(8500, 8750, 520)
 
         self.add_coin_line(6550, 470, 6)
         self.add_coin_line(7250, 390, 6)
+        self.add_coin_line(7950, 310, 8)
+        self.add_coin_line(8520, 450, 4)
 
         self.add_enemy(6700, HEIGHT - 128, "frog")
         self.add_enemy(6900, HEIGHT - 128, "ladybug")
@@ -181,29 +171,57 @@ class Level:
         self.add_spike(7070, HEIGHT - 112)
         self.add_spike(7700, HEIGHT - 112)
         self.add_spike(7770, HEIGHT - 112)
-
-        # =========================
-        # TRECHO FINAL
-        # =========================
-
-        self.add_platform(7900, 8350, 380)
-        self.add_platform(8500, 8750, 520)
-
-        self.add_coin_line(7950, 310, 8)
-        self.add_coin_line(8520, 450, 4)
-
-        # SEM INIMIGOS AQUI
-
         self.add_spike(8400, HEIGHT - 112)
 
-        # =========================
-        # ÁREA DA BANDEIRA
-        # =========================
+        # BLOCO 5
+        self.add_platform(9400, 9750, 500)
+        self.add_platform(10100, 10500, 420)
+        self.add_platform(10900, 11300, 540)
+        self.add_platform(11600, 11900, 380)
 
-        self.goal = Goal(
-            WORLD_WIDTH - 120,
-            HEIGHT - 192
-        )
+        self.add_coin_line(9450, 430, 7)
+        self.add_coin_line(10150, 350, 7)
+        self.add_coin_line(10950, 470, 6)
+        self.add_coin_line(11650, 310, 5)
+
+        self.add_enemy(9550, HEIGHT - 128, "ladybug")
+        self.add_enemy(10300, 330, "bee")
+        self.add_enemy(11000, HEIGHT - 128, "frog")
+        self.add_enemy(11700, 290, "bee")
+
+        self.add_spike(9850, HEIGHT - 112)
+        self.add_spike(9920, HEIGHT - 112)
+        self.add_spike(10600, HEIGHT - 112)
+
+        # BLOCO 6
+        self.add_platform(12400, 12800, 520)
+        self.add_platform(13200, 13600, 440)
+        self.add_platform(14000, 14450, 360)
+        self.add_platform(14900, 15200, 500)
+
+        self.add_coin_line(12450, 450, 7)
+        self.add_coin_line(13250, 370, 6)
+        self.add_coin_line(14050, 290, 8)
+        self.add_coin_line(14950, 430, 5)
+
+        self.add_enemy(12500, HEIGHT - 128, "frog")
+        self.add_enemy(13350, HEIGHT - 128, "ladybug")
+        self.add_enemy(14100, 270, "bee")
+        self.add_enemy(15000, 436, "frog")
+
+        self.add_spike(12900, HEIGHT - 112)
+        self.add_spike(13700, HEIGHT - 112)
+        self.add_spike(14550, HEIGHT - 112)
+
+        # FINAL LIMPO, SEM INIMIGOS
+        self.add_platform(16000, 16400, 500)
+        self.add_platform(16800, 17200, 420)
+
+        self.add_coin_line(16050, 430, 8)
+        self.add_coin_line(16850, 350, 8)
+
+        self.add_spike(15650, HEIGHT - 112)
+        self.add_spike(15720, HEIGHT - 112)
 
     def draw(self, screen, camera):
 

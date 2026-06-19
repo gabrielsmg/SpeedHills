@@ -28,8 +28,23 @@ class Player:
 
         self.facing_right = True
 
+        # =========================
+        # SOUNDS
+        # =========================
+
         self.coin_sound = pygame.mixer.Sound("../assets/sounds/coin.wav")
-        self.coin_sound.set_volume(0.3)
+        self.jump_sound = pygame.mixer.Sound("../assets/sounds/jump.mp3")
+        self.hurt_sound = pygame.mixer.Sound("../assets/sounds/hurt.mp3")
+        self.enemy_die_sound = pygame.mixer.Sound("../assets/sounds/enemy_die.mp3")
+
+        self.coin_sound.set_volume(0.25)
+        self.jump_sound.set_volume(0.25)
+        self.hurt_sound.set_volume(0.4)
+        self.enemy_die_sound.set_volume(0.35)
+
+        # =========================
+        # SPRITES
+        # =========================
 
         self.idle_sprite = pygame.image.load("../assets/player/idle/idle.png").convert_alpha()
         self.run_1 = pygame.image.load("../assets/player/run/run_1.png").convert_alpha()
@@ -89,6 +104,7 @@ class Player:
             self.facing_right = True
 
         if keys[pygame.K_SPACE] and self.on_ground:
+            self.jump_sound.play()
             self.velocity_y = jump_speed
             self.on_ground = False
 
@@ -230,6 +246,8 @@ class Player:
         if self.invincible:
             return
 
+        self.hurt_sound.play()
+
         if self.form == "soldier":
             self.form = "normal"
             self.enemies_killed = 0
@@ -278,6 +296,7 @@ class Player:
                 if player_is_falling and player_is_above_enemy:
 
                     enemies.remove(enemy)
+                    self.enemy_die_sound.play()
                     self.velocity_y = -14
                     self.add_enemy_kill()
 
