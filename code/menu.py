@@ -7,34 +7,49 @@ class Menu:
 
     def __init__(self):
 
-        self.title_font = pygame.font.SysFont("Arial", 82, bold=True)
-        self.font = pygame.font.SysFont("Arial", 36, bold=True)
+        self.background = pygame.image.load(
+            "../assets/backgrounds/menu_background.png"
+        ).convert_alpha()
 
-    def draw_text_outline(self, screen, text, font, color, outline_color, x, y):
+        self.background = pygame.transform.scale(
+            self.background,
+            (WIDTH, HEIGHT)
+        )
 
-        outline_size = 3
+        self.title_font = pygame.font.SysFont(
+            "Arial Black",
+            72
+        )
 
-        for dx in range(-outline_size, outline_size + 1):
+        self.font = pygame.font.SysFont(
+            "Trebuchet MS",
+            34,
+            bold=True
+        )
 
-            for dy in range(-outline_size, outline_size + 1):
+        self.small_font = pygame.font.SysFont(
+            "Trebuchet MS",
+            30,
+            bold=True
+        )
 
-                if dx != 0 or dy != 0:
+    def draw_text_shadow(self, screen, text, font, color, x, y):
 
-                    outline = font.render(
-                        text,
-                        True,
-                        outline_color
-                    )
-
-                    screen.blit(
-                        outline,
-                        (x + dx, y + dy)
-                    )
+        shadow = font.render(
+            text,
+            True,
+            BLACK
+        )
 
         text_surface = font.render(
             text,
             True,
             color
+        )
+
+        screen.blit(
+            shadow,
+            (x + 3, y + 3)
         )
 
         screen.blit(
@@ -44,60 +59,81 @@ class Menu:
 
     def draw_centered_text(self, screen, text, font, color, y):
 
-        text_surface = font.render(text, True, color)
+        text_surface = font.render(
+            text,
+            True,
+            color
+        )
 
         x = WIDTH // 2 - text_surface.get_width() // 2
 
-        self.draw_text_outline(
+        self.draw_text_shadow(
             screen,
             text,
             font,
             color,
-            BLACK,
             x,
             y
         )
 
     def draw(self, screen):
 
-        screen.fill((25, 35, 60))
+        screen.blit(
+            self.background,
+            (0, 0)
+        )
+
+        # leve escurecimento para melhorar leitura
+        overlay = pygame.Surface(
+            (WIDTH, HEIGHT),
+            pygame.SRCALPHA
+        )
+
+        overlay.fill(
+            (0, 0, 0, 55)
+        )
+
+        screen.blit(
+            overlay,
+            (0, 0)
+        )
 
         self.draw_centered_text(
             screen,
             "SPEED HILLS",
             self.title_font,
             YELLOW,
-            110
+            115
         )
 
         self.draw_centered_text(
             screen,
-            "ENTER - Iniciar",
+            "ENTER  -  Iniciar",
             self.font,
             WHITE,
-            280
+            310
         )
 
         self.draw_centered_text(
             screen,
-            "A / D - Mover",
-            self.font,
+            "A / D  -  Mover",
+            self.small_font,
             WHITE,
-            360
+            380
         )
 
         self.draw_centered_text(
             screen,
-            "SPACE - Pular",
-            self.font,
+            "SPACE  -  Pular",
+            self.small_font,
             WHITE,
-            420
+            430
         )
 
         self.draw_centered_text(
             screen,
-            "ESC - Sair",
-            self.font,
+            "ESC  -  Sair",
+            self.small_font,
             WHITE,
-            520
+            500
         )
