@@ -17,7 +17,7 @@ class Level:
         self.enemies = []
         self.obstacles = []
 
-        self.goal = Goal(WORLD_WIDTH - 180, HEIGHT - 192)
+        self.goal = Goal(WORLD_WIDTH - 120, HEIGHT - 192)
 
         self.ground_tile = pygame.image.load(
             "../assets/tiles/ground.png"
